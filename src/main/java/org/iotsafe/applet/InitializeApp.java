@@ -13,8 +13,12 @@ public class InitializeApp {
 	public final static byte[] FILE_0001 = Tools.hexStringToBytes("830200017302303160010121010120020040");
 	public final static byte[] PRIV_KEY_0002 = Tools.hexStringToBytes("84020002740231316001024B01134E0103610107920104910200076F0101");
 	public final static byte[] PUB_KEY_0002 = Tools.hexStringToBytes("85020002750231316001024B01134E0103610107920104910200076F0101");
- 
-    public static void main(String[] args) {
+
+    public InitializeApp() {
+
+    }
+
+    public void startInitializeApp() {
 		// Initialize BC security provider
         Security.addProvider(new BouncyCastleProvider());	
         
@@ -22,11 +26,11 @@ public class InitializeApp {
         	
             System.out.println("--------------------------");
             System.out.println("Start IoT SAFE applet test");  
-            String readerName = "";
+            String readerName = "OMNIKEY Smart Card Reader USB 0";
             
-            if(args.length > 0) {
-            	readerName = args[0];
-            } 	
+//            if(args.length > 0) {
+//            	readerName = args[0];
+//            }
 		    
             // Connect to NFC device (= card) with given terminal/reader name
             CardChannel cardChannel = IoTSAFETools.connectCard(readerName);             

@@ -18,10 +18,11 @@ public class IoTSAFETools {
 	
 	/** Card reader name */
     //private static final String READER_NAME = "OMNIKEY CardMan 5x21-CL 0";
+    private static final String READER_NAME = "OMNIKEY Smart Card Reader USB 0";
     //private static String READER_NAME = "ACS ACR122U PICC Interface 0";
     //private static String READER_NAME = "ACS ACR1252 1S CL Reader PICC 0";
     //private static String READER_NAME = "NXP VirtualPCSCInterface 0";
-    private static String READER_NAME = "Identiv uTrust 3700 F CL Reader 0";
+    //!private static String READER_NAME = "Identiv uTrust 3700 F CL Reader 0";
     
 	/** Smart card status word in case of success */
     public static final int STATUS_OK = 0x9000;
@@ -226,6 +227,31 @@ public class IoTSAFETools {
                 throw new CardletException("APDU communication with NFC device failed");                            
             }
             
+            return resp.getData();
+        }
+        catch (CardletException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns public key of IoT SAFE applet
+     *
+     * @param channel Currently opened card channel
+     *
+     * @return Public key as byte array
+     *
+     */
+    public static byte[] getPublicKey(CardChannel channel) throws CardletException
+    {
+        try {
+            // get public key of IoT SAFE applet
+            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(IoTSAFEDefines.GET_PUBLIC_KEY_APDU_HDR));
+            if(resp.getSW() != STATUS_OK)
+            {
+                throw new CardletException("APDU communication with NFC device failed");
+            }
+
             return resp.getData();
         }
         catch (CardletException e) {

@@ -20,6 +20,8 @@ public class IoTSAFEDefines {
     
     public static final byte[] GET_RANDOM_APDU_HDR = Tools.hexStringToBytes("80840000");
     public static final byte[] GEN_KEY_PAIR_APDU_HDR = Tools.hexStringToBytes("80B90000");
+
+    public static final byte[] GET_PUBLIC_KEY_APDU_HDR = Tools.hexStringToBytes("80CD0000"); //?
     
     public static final byte[] GET_DATA_APP_APDU_CMD = Tools.hexStringToBytes("80CB000044");
     public static final byte[] GET_DATA_OBJ_LIST_APDU_CMD = Tools.hexStringToBytes("80CB0100");

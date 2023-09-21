@@ -4,9 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>org.iotsafe.tool</groupId>
     <artifactId>IoT_SAFE_Tool</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -14,6 +15,69 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+<!--
+    <repositories>
+        <repository>
+            <id>localrepository</id>
+            <url>file://${pom.basedir}/lib</url>
+        </repository>
+    </repositories>
+-->
+    <dependencies>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.54</version>
+            <!--
+            <scope>system</scope>
+            <systemPath>${pom.basedir}\lib\bcprov-jdk15on-154.jar</systemPath>
+            -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.2.1</version>
+            <!--
+            <scope>system</scope>
+            <systemPath>${pom.basedir}\lib\commons-lang3-3.2.1.jar</systemPath>
+            -->
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <!--
+            <scope>system</scope>
+            <systemPath>${pom.basedir}\lib\guava-18.0.jar</systemPath>
+            -->
+        </dependency>
+    </dependencies>
+<!--
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>executable-jar</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+-->
 
     <build>
         <plugins>
@@ -31,5 +95,32 @@
             </plugin>
         </plugins>
     </build>
+
+<!--
+    <dependencies>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>dependency</artifactId>
+            <version>1.54</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/bcprov-jdk15on-154.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons.lang3</groupId>
+            <artifactId>dependency</artifactId>
+            <version>3.2.1</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/commons-lang3-3.2.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.google.common.net</groupId>
+            <artifactId>dependency</artifactId>
+            <version>18.0.0</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/guava-18.0.jar</systemPath>
+        </dependency>
+    </dependencies>
+-->
+
 
 </project>

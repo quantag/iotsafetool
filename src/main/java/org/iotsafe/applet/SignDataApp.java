@@ -24,11 +24,11 @@ public class SignDataApp {
         	
             System.out.println("--------------------------");
             System.out.println("Start IoT SAFE applet test");  
-            String readerName = "";
+            String readerName = "OMNIKEY Smart Card Reader USB 0";
             
-            if(args.length > 0) {
-            	readerName = args[0];
-            } 	
+            //if(args.length > 0) {
+            //	readerName = args[0];
+            //}
 		    
             // Connect to NFC device (= card) with given terminal/reader name
             CardChannel cardChannel = IoTSAFETools.connectCard(readerName);             
