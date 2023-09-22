@@ -18,6 +18,8 @@ public class IoTSAFEToolCL {
             ioTSAFETool.runGenKeys();
         else if (argValue.matches("-getpub"))
             ioTSAFETool.runGetPublicKey();
+        else if (argValue.matches("-version"))
+            ioTSAFETool.getAppletVersion();
         else
             ioTSAFETool.getHelpMessage();
     }
