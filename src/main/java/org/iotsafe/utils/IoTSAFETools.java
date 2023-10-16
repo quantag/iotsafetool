@@ -242,11 +242,78 @@ public class IoTSAFETools {
      * @return Public key as byte array
      *
      */
-    public static byte[] getPublicKey(CardChannel channel) throws CardletException
+    public static byte[] getPublicKey(CardChannel channel, byte[] privateKeyInput) throws CardletException
     {
         try {
+            byte[] apduBuf = null;
+            apduBuf = ArrayUtils.addAll(apduBuf, IoTSAFEDefines.GET_PUBLIC_KEY_APDU_CMD);
+            // total length
+            apduBuf = ArrayUtils.add(apduBuf, (byte)(privateKeyInput.length));
+            // data
+            apduBuf = ArrayUtils.addAll(apduBuf, privateKeyInput);
+
+            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(apduBuf));
+            if(resp.getSW() != STATUS_OK)
+            {
+                throw new CardletException("APDU communication with NFC device failed");
+            }
+
+            return resp.getData();
+        }
+        catch (CardletException e) {
+            throw e;
+        }
+
+        /*
+        try {
             // get public key of IoT SAFE applet
-            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(IoTSAFEDefines.GET_PUBLIC_KEY_APDU_HDR));
+            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(IoTSAFEDefines.GET_PUBLIC_KEY_APDU_CMD));
+            if(resp.getSW() != STATUS_OK)
+            {
+                throw new CardletException("APDU communication with NFC device failed");
+            }
+
+            return resp.getData();
+        }
+        catch (CardletException e) {
+            throw e;
+        }
+        */
+    }
+
+    public static byte[] getFile(CardChannel channel, byte[] fileInput) throws CardletException {
+        try {
+            byte[] apduBuf = null;
+            apduBuf = ArrayUtils.addAll(apduBuf, IoTSAFEDefines.GET_DATA_FILE_APDU_CMD);
+            // total length
+            apduBuf = ArrayUtils.add(apduBuf, (byte) (fileInput.length));
+            // data
+            apduBuf = ArrayUtils.addAll(apduBuf, fileInput);
+
+            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(apduBuf));
+            if (resp.getSW() != STATUS_OK) {
+                throw new CardletException("APDU communication with NFC device failed");
+            }
+
+            return resp.getData();
+        } catch (CardletException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Returns data file of IoT SAFE applet
+     *
+     * @param channel Currently opened card channel
+     *
+     * @return file as byte array
+     *
+     */
+    public static byte[] getDataFile(CardChannel channel) throws CardletException
+    {
+        try {
+            // get data file of IoT SAFE applet
+            ResponseAPDU resp = executeCommand(channel, new CommandAPDU(IoTSAFEDefines.GET_DATA_FILE_APDU_CMD));
             if(resp.getSW() != STATUS_OK)
             {
                 throw new CardletException("APDU communication with NFC device failed");
@@ -258,7 +325,7 @@ public class IoTSAFETools {
             throw e;
         }
     }
- 
+
     /**
      * Store private key
      * 

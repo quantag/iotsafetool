@@ -9,7 +9,7 @@ import java.security.Security;
 
 
 public class IoTSAFETool {
-    private String readerName = "";
+    private final String readerName;
 
     public IoTSAFETool(String readerName) {
         this.readerName = readerName;
@@ -17,7 +17,6 @@ public class IoTSAFETool {
 
     public void runGenKeys() {
         final byte[] KEY_PAIR_0002 = Tools.hexStringToBytes("84020002");
-        System.out.println("--- start GenKeys()");
 
         // Initialize BC security provider
         Security.addProvider(new BouncyCastleProvider());
@@ -38,7 +37,6 @@ public class IoTSAFETool {
         catch (Exception e) {
             System.out.println("ERROR: "+ e.getClass() +": "+ e.getMessage());
         }
-        System.out.println("--- stop GenKeys()");
     }
 
     public void getAppletVersion() {
@@ -64,7 +62,33 @@ public class IoTSAFETool {
     }
 
     public void runGetPublicKey() {
-        System.out.println("--- start GetPublicKey()");
+        // Initialize BC security provider
+        Security.addProvider(new BouncyCastleProvider());
+
+        try {
+            // Connect to NFC device (= card) with given terminal/reader name
+            CardChannel cardChannel = IoTSAFETools.connectCard(readerName);
+            System.out.println("NFC device found and connected");
+
+            // Select IoT SAFE applet
+            IoTSAFETools.selectIoTSAFEApplet(cardChannel);
+            System.out.println("IoT SAFE applet selected");
+
+              final byte[] sdhkkshfjsk = Tools.hexStringToBytes("8502000200");
+            //final byte[] sdhkkshfjsk = Tools.hexStringToBytes("75023131");
+            byte[] publicKeyData = IoTSAFETools.getPublicKey(cardChannel, sdhkkshfjsk);
+            System.out.println("Public key: " + Tools.bytesToHexString(publicKeyData));
+        }
+        catch (Exception e) {
+            System.out.println("ERROR: "+ e.getClass() +": "+ e.getMessage());
+        }
+    }
+
+    public void runHmac(byte[] byteFile) {
+        final byte[] COMP_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("84020002A1010191020001920104");
+        //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B080102030405060708"); //original
+        //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B08B19AB43AFE195BD6"); //my test
+        final byte[] VER_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("85020002A1010191020001920104");
 
         // Initialize BC security provider
         Security.addProvider(new BouncyCastleProvider());
@@ -77,12 +101,35 @@ public class IoTSAFETool {
             // Select IoT SAFE applet
             IoTSAFETools.selectIoTSAFEApplet(cardChannel);
             System.out.println("IoT SAFE applet selected");
+
+            // Sign data
+            byte[] signature = null;
+            try {
+                System.out.println("Sign data...");
+                IoTSAFETools.computeSignInitOpenSession(cardChannel, COMP_SIGN_INIT_OPEN_SESSION_0002);
+                signature = IoTSAFETools.computeSignUpdateFinal(cardChannel, byteFile);
+                //! IoTSAFETools.computeSignInitCloseSession(cardChannel);
+                System.out.println("Signature: " + Tools.bytesToHexString(signature));
+            }
+            finally {
+                IoTSAFETools.computeSignInitCloseSession(cardChannel);
+            }
+
+            // Verify signature
+            System.out.println("Verify signature...");
+            IoTSAFETools.verifySignInitOpenSession(cardChannel, VER_SIGN_INIT_OPEN_SESSION_0002);
+            try {
+                IoTSAFETools.verifySignUpdateFinal(cardChannel, byteFile, signature);
+                System.out.println("Signature verification successfully completed");
+            }
+            catch(Exception ex) {
+                System.out.println("Signature verification failed");
+            }
+            IoTSAFETools.verifySignInitCloseSession(cardChannel);
         }
         catch (Exception e) {
             System.out.println("ERROR: "+ e.getClass() +": "+ e.getMessage());
         }
-
-        System.out.println("--- stop GetPublicKey()");
     }
 
     public void getHelpMessage() {

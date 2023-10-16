@@ -21,10 +21,13 @@ public class IoTSAFEDefines {
     public static final byte[] GET_RANDOM_APDU_HDR = Tools.hexStringToBytes("80840000");
     public static final byte[] GEN_KEY_PAIR_APDU_HDR = Tools.hexStringToBytes("80B90000");
 
-    public static final byte[] GET_PUBLIC_KEY_APDU_HDR = Tools.hexStringToBytes("80CD0000"); //?
+    //public static final byte[] GET_PUBLIC_KEY_APDU_CMD = Tools.hexStringToBytes("80CBC200"); //?
+    public static final byte[] GET_PUBLIC_KEY_APDU_CMD = Tools.hexStringToBytes("80CD0000"); //?
     
     public static final byte[] GET_DATA_APP_APDU_CMD = Tools.hexStringToBytes("80CB000044");
     public static final byte[] GET_DATA_OBJ_LIST_APDU_CMD = Tools.hexStringToBytes("80CB0100");
+
+    public static final byte[] GET_DATA_FILE_APDU_CMD = Tools.hexStringToBytes("80CBC300"); //?
     
     public static final byte[] COMP_SIGN_INIT_OPEN_SESSION_APDU_HDR = Tools.hexStringToBytes("802A0001");
     public static final byte[] COMP_SIGN_INIT_CLOSE_SESSION_APDU_CMD = Tools.hexStringToBytes("802A0101");
