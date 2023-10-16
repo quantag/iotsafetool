@@ -15,46 +15,21 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-<!--
-    <repositories>
-        <repository>
-            <id>localrepository</id>
-            <url>file://${pom.basedir}/lib</url>
-        </repository>
-    </repositories>
--->
-    <dependencies>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.54</version>
-            <!--
-            <scope>system</scope>
-            <systemPath>${pom.basedir}\lib\bcprov-jdk15on-154.jar</systemPath>
-            -->
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.2.1</version>
-            <!--
-            <scope>system</scope>
-            <systemPath>${pom.basedir}\lib\commons-lang3-3.2.1.jar</systemPath>
-            -->
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-            <!--
-            <scope>system</scope>
-            <systemPath>${pom.basedir}\lib\guava-18.0.jar</systemPath>
-            -->
-        </dependency>
-    </dependencies>
-<!--
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.iotsafe.tool.IoTSAFEToolCL</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -63,7 +38,11 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>executable-jar</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.iotsafe.tool.IoTSAFEToolCL</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
                 <executions>
                     <execution>
@@ -77,50 +56,22 @@
             </plugin>
         </plugins>
     </build>
--->
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.iotsafe.tool.IoTSAFETool</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-<!--
     <dependencies>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>dependency</artifactId>
+            <artifactId>bcprov-jdk15on</artifactId>
             <version>1.54</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/bcprov-jdk15on-154.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons.lang3</groupId>
-            <artifactId>dependency</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
             <version>3.2.1</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/commons-lang3-3.2.1.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.google.common.net</groupId>
-            <artifactId>dependency</artifactId>
-            <version>18.0.0</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/guava-18.0.jar</systemPath>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
         </dependency>
     </dependencies>
--->
-
-
 </project>
