@@ -10,57 +10,73 @@ import java.security.NoSuchAlgorithmException;
 public class IoTSAFEToolCL {
 
     public static void main(String[] args) {
-        IoTSAFETool ioTSAFETool = new IoTSAFETool("OMNIKEY Smart Card Reader USB 0");
-        String argValue = "";
+        //OMNIKEY Smart Card Reader USB 0
 
-        if (args.length > 0) {
-            argValue = args[0];
-        }
-
-        if (argValue.length() == 0)
-            ioTSAFETool.getHelpMessage();
-        else if (argValue.matches("-?") || argValue.matches("-h") || argValue.matches("-help"))
-            ioTSAFETool.getHelpMessage();
-        else if (argValue.matches("-genkeys"))
-            ioTSAFETool.runGenKeys();
-        else if (argValue.matches("-getpub"))
-            ioTSAFETool.runGetPublicKey();
-        else if (argValue.matches("-hmac")) {
-            //-hmac TestCase1.txt
-            if (args.length == 1) {
-                System.out.println("ERROR: no filename in command -hmac");
-                ioTSAFETool.getHelpMessage();
-            }
-            String fileName = args[1];
-            byte[] hash = null;
-
-            try {
-                byte[] buffer = new byte[8192];
-                int count;
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileName));
-                while ((count = bis.read(buffer)) > 0) {
-                    digest.update(buffer, 0, count);
+        String terminalIndex = "0";
+        String[] argsList = args;
+        for(int i=0; i<args.length; i++) {
+            if (argsList[i].matches("-reader")) {
+                if (args.length > i+1) {
+                    terminalIndex = argsList[i+1];
+                    break;
                 }
-                bis.close();
-                hash = digest.digest();
             }
-            catch(NoSuchAlgorithmException nsae) {
-                System.out.println("ERROR - NoSuchAlgorithmException: "+ nsae);
-            }
-            catch(FileNotFoundException fnfe) {
-                System.out.println("ERROR - FileNotFoundException: "+ fnfe);
-            }
-            catch(IOException ioe) {
-                System.out.println("ERROR - IOException: "+ ioe);
-            }
-
-            ioTSAFETool.runHmac(hash);
         }
-        else if (argValue.matches("-version"))
-            ioTSAFETool.getAppletVersion();
-        else
-            ioTSAFETool.getHelpMessage();
+
+        IoTSAFETool ioTSAFETool = new IoTSAFETool(terminalIndex);
+
+        for(int i=0; i<args.length; i++) {
+            if (argsList[i].matches("-?") || argsList[i].matches("-h") || argsList[i].matches("-help")) {
+                ioTSAFETool.getHelpMessage();
+                break;
+            }
+            else if (argsList[i].matches("-list")) {
+                ioTSAFETool.getCardReadersList();
+                break;
+            }
+            else if (argsList[i].matches("-genkeys")) {
+                ioTSAFETool.runGenKeys();
+                break;
+            }
+            else if (argsList[i].matches("-getpub")) {
+                ioTSAFETool.runGetPublicKey();
+                break;
+            }
+            else if (argsList[i].matches("-hmac")) {
+                //-hmac TestCase1.txt
+                if (args.length > i+1) {
+                    System.out.println("ERROR: no filename in command -hmac");
+                    ioTSAFETool.getHelpMessage();
+                }
+                String fileName = argsList[i+1];
+                byte[] hash = null;
+
+                try {
+                    byte[] buffer = new byte[8192];
+                    int count;
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileName));
+                    while ((count = bis.read(buffer)) > 0) {
+                        digest.update(buffer, 0, count);
+                    }
+                    bis.close();
+                    hash = digest.digest();
+                } catch (NoSuchAlgorithmException nsae) {
+                    System.out.println("ERROR - NoSuchAlgorithmException: " + nsae);
+                } catch (FileNotFoundException fnfe) {
+                    System.out.println("ERROR - FileNotFoundException: " + fnfe);
+                } catch (IOException ioe) {
+                    System.out.println("ERROR - IOException: " + ioe);
+                }
+
+                ioTSAFETool.runHmac(hash);
+                break;
+            }
+            else if (argsList[i].matches("-version")) {
+                ioTSAFETool.getAppletVersion();
+                break;
+            }
+        }
     }
 
 }

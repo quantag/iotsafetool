@@ -18,7 +18,7 @@ public class IoTSAFETools {
 	
 	/** Card reader name */
     //private static final String READER_NAME = "OMNIKEY CardMan 5x21-CL 0";
-    private static final String READER_NAME = "OMNIKEY Smart Card Reader USB 0";
+//!    private static final String READER_NAME = "OMNIKEY Smart Card Reader USB 0";
     //private static String READER_NAME = "ACS ACR122U PICC Interface 0";
     //private static String READER_NAME = "ACS ACR1252 1S CL Reader PICC 0";
     //private static String READER_NAME = "NXP VirtualPCSCInterface 0";
@@ -59,10 +59,11 @@ public class IoTSAFETools {
 	{
 		// use default reader name if none is provided
 		if(name.isEmpty()) {
-			name = READER_NAME;
+//!			name = READER_NAME;
 		}
 		
-		System.out.println("Used card reader: " + name); 	
+//!		System.out.println("Used card reader: " + name);
+
 		// Get the list of available terminals
 		TerminalFactory factory = TerminalFactory.getDefault();
 		List<CardTerminal> terminals;
@@ -73,11 +74,12 @@ public class IoTSAFETools {
 		catch (CardException e) {
 			throw new CardletException("No card reader available");
 		}
-	
+
 		int i = terminals.size() - 1;
 	
 		// If name == null: select first available terminal
-		if (name == null)
+//?		if (name == null)
+        if (name.isEmpty())
 		{
 			// If at least one terminal is available, select the first one
 			if (terminals.size() > 0) 									
@@ -98,8 +100,9 @@ public class IoTSAFETools {
 		// If no matching terminal found
 		if (i < 0)												
 			throw new CardletException("No matching card reader found");
-		
-		
+
+        System.out.println("Used card reader: " + terminals.get(i).getName());
+
 		// Connect to the card
 		try 
 		{
