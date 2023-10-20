@@ -2,13 +2,7 @@ package org.iotsafe.utils;
 
 import java.util.List;
 
-import javax.smartcardio.Card;
-import javax.smartcardio.CardChannel;
-import javax.smartcardio.CardException;
-import javax.smartcardio.CardTerminal;
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-import javax.smartcardio.TerminalFactory;
+import javax.smartcardio.*;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.iotsafe.exception.CardletException;
@@ -124,7 +118,10 @@ public class IoTSAFETools {
 			}
 			
 			return channel;
-		} 
+		}
+        catch (CardNotPresentException cnpe) {
+            throw new CardletException("Card not present");
+        }
 		catch (CardException e) {
 			throw new CardletException("NFC device not available");
 		}

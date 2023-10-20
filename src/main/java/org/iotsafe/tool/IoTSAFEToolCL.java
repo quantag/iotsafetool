@@ -44,10 +44,10 @@ public class IoTSAFEToolCL {
             }
             else if (argsList[i].matches("-hmac")) {
                 //-hmac TestCase1.txt
-                if (args.length > i+1) {
-                    System.out.println("ERROR: no filename in command -hmac");
-                    ioTSAFETool.getHelpMessage();
-                }
+//?                if (args.length > i+1) {
+//?                    System.out.println("ERROR: no filename in command -hmac");
+//?                    ioTSAFETool.getHelpMessage();
+//?                }
                 String fileName = argsList[i+1];
                 byte[] hash = null;
 

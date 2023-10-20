@@ -121,17 +121,17 @@ public class IoTSAFETool {
         }
     }
 
-    public void runHmac(byte[] AbyteFile) {
+    public void runHmac(byte[] byteFile) {
         final byte[] COMP_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("84020002A1010191020001920104");
         //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B080102030405060708"); //original
         //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B08B19AB43AFE195BD6"); //my test
         final byte[] VER_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("85020002A1010191020001920104");
 
-        byte[] byteFile = Tools.hexStringToBytes("B19AB43AFE195BD6");
+        //byte[] byteFile = Tools.hexStringToBytes("B19AB43AFE195BD6");
         byte[] addBytes = Tools.hexStringToBytes("9B08");
-        byte[] finalByteFile = new byte[addBytes.length + byteFile.length];
+        byte[] finalByteFile = new byte[addBytes.length + 8]; //byteFile.length
         System.arraycopy(addBytes, 0, finalByteFile, 0, addBytes.length);
-        System.arraycopy(byteFile, 0, finalByteFile, addBytes.length, byteFile.length);
+        System.arraycopy(byteFile, 0, finalByteFile, addBytes.length, 8); //byteFile.length
 
         // Initialize BC security provider
         Security.addProvider(new BouncyCastleProvider());
