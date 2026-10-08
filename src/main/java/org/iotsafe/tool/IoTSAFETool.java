@@ -20,6 +20,7 @@ package org.iotsafe.tool;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.iotsafe.exception.CardletException;
+import org.iotsafe.utils.IoTSAFEDefines;
 import org.iotsafe.utils.IoTSAFETools;
 import org.iotsafe.utils.Tools;
 
@@ -146,15 +147,34 @@ public class IoTSAFETool {
 
     public void runHmac(byte[] byteFile) {
         final byte[] COMP_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("84020002A1010191020001920104");
-        //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B080102030405060708"); //original
-        //final byte[] DATA_TO_SIGN = Tools.hexStringToBytes("9B08B19AB43AFE195BD6"); //my test
         final byte[] VER_SIGN_INIT_OPEN_SESSION_0002 = Tools.hexStringToBytes("85020002A1010191020001920104");
 
-        //byte[] byteFile = Tools.hexStringToBytes("B19AB43AFE195BD6");
-        byte[] addBytes = Tools.hexStringToBytes("9B08");
-        byte[] finalByteFile = new byte[addBytes.length + 8]; //byteFile.length
-        System.arraycopy(addBytes, 0, finalByteFile, 0, addBytes.length);
-        System.arraycopy(byteFile, 0, finalByteFile, addBytes.length, 8); //byteFile.length
+        if (byteFile == null || byteFile.length == 0) {
+            System.out.println("ERROR: no hash to sign");
+            return;
+        }
+
+        // The data-to-sign object is a TLV: tag, length, value. A single length
+        // octet can carry at most 0x7F, which covers SHA-256, SHA-384 and
+        // SHA-512; anything longer would need the long form.
+        if (byteFile.length > 0x7F) {
+            System.out.println("ERROR: hash of " + byteFile.length
+                    + " bytes needs long-form TLV length encoding, which is not implemented");
+            return;
+        }
+
+        // Build the data-to-sign object over the WHOLE hash.
+        //
+        // This used to hard-code the first two bytes to 9B 08 -- tag 9B,
+        // length 8 -- and copy 8 bytes out of the 32-byte SHA-256 digest, so
+        // the card signed a 64-bit truncation of the file digest. Verification
+        // was handed the same truncated object, so it succeeded and the tool
+        // reported success. The length now follows the hash, which is what the
+        // commented-out byteFile.length on those lines was reaching for.
+        byte[] finalByteFile = new byte[2 + byteFile.length];
+        finalByteFile[0] = IoTSAFEDefines.TAG_DATA_TO_SIGN;
+        finalByteFile[1] = (byte) byteFile.length;          // 0x20 for SHA-256
+        System.arraycopy(byteFile, 0, finalByteFile, 2, byteFile.length);
 
         // Initialize BC security provider
         Security.addProvider(new BouncyCastleProvider());

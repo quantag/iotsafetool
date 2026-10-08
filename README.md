@@ -126,8 +126,9 @@ automated tests, and errors are reported by printing a message rather than by a
 non-zero exit status, so it does not script cleanly yet.
 
 [docs/review-notes.md](docs/review-notes.md) lists what a user is most likely
-to trip over, including the `-hmac` option signing only the first 8 bytes of
-the digest it computes.
+to trip over. The one High-severity item there — `-hmac` signing only the first
+8 bytes of the digest it computed — is fixed; seven lower-severity items remain
+open.
 
 It is useful if you want to watch real APDU traffic against an IoT SAFE applet
 and have a starting point you can modify. It is not a finished product, and

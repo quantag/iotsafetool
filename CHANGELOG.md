@@ -5,6 +5,27 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Security
+
+- **`-hmac` now signs the whole digest** (review note 1). It computed a 32-byte
+  SHA-256 digest of the file, then built the data-to-sign object with a
+  hard-coded `9B 08` — tag `9B`, length 8 — and copied only 8 bytes, so the
+  card signed a 64-bit truncation. Verification was handed the same truncated
+  object, so the tool printed "Signature verification successfully completed"
+  and nothing looked wrong. Two files agreeing in their first 8 digest bytes
+  produced identical signatures.
+
+  The length now follows the hash. `runHmac` also rejects a null or empty
+  hash, and rejects one longer than `0x7F` bytes, which would need long-form
+  TLV length encoding that this tool does not implement — SHA-256, SHA-384 and
+  SHA-512 all fit the short form.
+
+  **Any signature produced by an earlier build covers 8 bytes of the digest,
+  not the file. Regenerate them.**
+
+  Not yet verified against a card: whether a given applet accepts a 32-byte
+  data-to-sign object depends on the signature session it was opened with.
+
 ### Added
 
 - Apache License 2.0, with a `NOTICE` file carrying the attribution requirement
@@ -15,8 +36,8 @@ All notable changes to this project are documented here. The format follows
 - `docs/third-party.md` — the libraries the shaded jar embeds, the licence
   obligations redistribution creates, and the versions to move to.
 - `docs/review-notes.md` — eight limitations found by source review, with line
-  references. Note 1 is the one that matters: `-hmac` signs only the first
-  8 bytes of the SHA-256 digest it computes.
+  references. Note 1, since fixed, was the one that mattered: `-hmac` signed
+  only the first 8 bytes of the SHA-256 digest it computes.
 - `CONTRIBUTING.md` and `SECURITY.md`.
 - Continuous integration: Maven build, licence header check, markdown link
   check.

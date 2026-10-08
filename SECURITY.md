@@ -11,12 +11,13 @@ Known limitations, including ones with security relevance, are published in
 that first — if your finding is already listed, an issue adding detail or a
 patch is more useful than a private report.
 
-Two things that are already known and are not news:
+Two things worth knowing before you report:
 
-- **`-hmac` signs only the first 8 bytes of the SHA-256 digest it computes**
-  (review note 1). A signature produced by this tool covers a 64-bit truncation
-  of the file digest, and the tool reports success. Do not treat signatures
-  produced by `-hmac` as covering the file.
+- **`-hmac` used to sign only the first 8 bytes of the SHA-256 digest it
+  computes** (review note 1). This is now fixed: the card signs the whole
+  digest. **Any signature produced by a build from before that fix covers a
+  64-bit truncation of the file digest, not the file** — treat such signatures
+  as worthless and regenerate them.
 - **The shaded jar bundles third-party libraries at old versions**
   (`bcprov-jdk15on` 1.70, `commons-lang3` 3.2.1). Vulnerabilities in those
   belong to their upstreams; see [docs/third-party.md](docs/third-party.md) for

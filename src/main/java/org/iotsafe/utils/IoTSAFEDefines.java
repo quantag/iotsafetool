@@ -58,4 +58,9 @@ public class IoTSAFEDefines {
     public static final byte[] VER_SIGN_INIT_OPEN_SESSION_APDU_HDR = Tools.hexStringToBytes("802C0001");
     public static final byte[] VER_SIGN_INIT_CLOSE_SESSION_APDU_CMD = Tools.hexStringToBytes("802C0101");
     public static final byte[] VER_SIGN_UPDATE_FINAL_APDU_HDR = Tools.hexStringToBytes("802D8001");
+
+    /** TLV tags */
+
+    /** Tag of the data-to-sign object carried by compute and verify signature */
+    public static final byte TAG_DATA_TO_SIGN = (byte) 0x9B;
 }

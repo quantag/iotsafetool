@@ -5,24 +5,28 @@ against the current `main`. None of these is a vulnerability in a deployed
 system — this is a development tool, and the list exists so that anyone picking
 it up knows what they are getting.
 
-| # | Severity | Issue | Location |
-| --- | --- | --- | --- |
-| 1 | High | `-hmac` signs only the first 8 bytes of the digest it computes | `IoTSAFETool.java:155-157` |
-| 2 | Medium | `-hmac` with no filename throws `ArrayIndexOutOfBoundsException` | `IoTSAFEToolCL.java:74` |
-| 3 | Medium | Failures print a message and exit zero | `IoTSAFETool.java:76,98,142,196` |
-| 4 | Medium | Object identifiers and session parameters are hard-coded | `IoTSAFETool.java:58,148` |
-| 5 | Low | `-reader` with a bad index throws instead of reporting | `IoTSAFETool.java:54` |
-| 6 | Low | BouncyCastle is registered but never used | four files — see [third-party.md](third-party.md) |
-| 7 | Low | `applet/` classes hard-code a reader name and are unreachable | `InitializeApp`, `ReadDataApp`, `SignDataApp` |
-| 8 | Info | A variable is named `sdhkkshfjsk` | `IoTSAFETool.java:137` |
+Issue numbers are stable: a fixed issue keeps its number and is marked
+**Fixed** rather than removed, so references from commits and other documents
+stay meaningful.
+
+| # | Severity | Status | Issue | Location |
+| --- | --- | --- | --- | --- |
+| 1 | High | **Fixed** | `-hmac` signs only the first 8 bytes of the digest it computes | `IoTSAFETool.java:152-176` |
+| 2 | Medium | Open | `-hmac` with no filename throws `ArrayIndexOutOfBoundsException` | `IoTSAFEToolCL.java:74` |
+| 3 | Medium | Open | Failures print a message and exit zero | `IoTSAFETool.java:76,98,142,196` |
+| 4 | Medium | Open | Object identifiers and session parameters are hard-coded | `IoTSAFETool.java:58,148` |
+| 5 | Low | Open | `-reader` with a bad index throws instead of reporting | `IoTSAFETool.java:54` |
+| 6 | Low | Open | BouncyCastle is registered but never used | four files — see [third-party.md](third-party.md) |
+| 7 | Low | Open | `applet/` classes hard-code a reader name and are unreachable | `InitializeApp`, `ReadDataApp`, `SignDataApp` |
+| 8 | Info | Open | A variable is named `sdhkkshfjsk` | `IoTSAFETool.java:137` |
 
 ---
 
-## 1. `-hmac` signs only the first 8 bytes of the digest
+## 1. `-hmac` signs only the first 8 bytes of the digest — Fixed
 
-`IoTSAFEToolCL` computes a full SHA-256 digest of the file, 32 bytes. `runHmac`
-then builds the data-to-sign object with a hard-coded 2-byte prefix `9B 08` —
-tag `9B`, length **8** — and copies exactly 8 bytes:
+**Was:** `IoTSAFEToolCL` computed a full SHA-256 digest of the file, 32 bytes.
+`runHmac` then built the data-to-sign object with a hard-coded 2-byte prefix
+`9B 08` — tag `9B`, length **8** — and copied exactly 8 bytes:
 
 ```java
 byte[] addBytes = Tools.hexStringToBytes("9B08");
@@ -31,19 +35,33 @@ System.arraycopy(addBytes, 0, finalByteFile, 0, addBytes.length);
 System.arraycopy(byteFile, 0, finalByteFile, addBytes.length, 8);  // byteFile.length
 ```
 
-The commented-out `byteFile.length` on both lines shows the intent: the length
-should follow the digest. As written, 24 of the 32 digest bytes are discarded,
-and the card signs a 64-bit truncation. Two different files agreeing in the
-first 8 digest bytes produce the same signature.
+The commented-out `byteFile.length` on both lines showed the intent. As
+written, 24 of the 32 digest bytes were discarded and the card signed a 64-bit
+truncation, so two files agreeing in their first 8 digest bytes produced the
+same signature. The signature then verified, because verification was handed
+the same truncated object — the tool reported success and nothing looked wrong.
 
-The signature verifies, because verification is handed the same truncated
-object — so the tool reports success and nothing looks wrong.
+**Fixed by** letting the length follow the hash:
 
-**Fix direction:** set the length byte from `byteFile.length` and copy all of
-it, which means encoding the length properly rather than hard-coding `9B 08`.
-Check first what digest lengths the target applet's signature session accepts.
+```java
+byte[] finalByteFile = new byte[2 + byteFile.length];
+finalByteFile[0] = IoTSAFEDefines.TAG_DATA_TO_SIGN;   // 0x9B
+finalByteFile[1] = (byte) byteFile.length;            // 0x20 for SHA-256
+System.arraycopy(byteFile, 0, finalByteFile, 2, byteFile.length);
+```
 
-The option is also misnamed: it computes a digest and asks the card for a
+`runHmac` now also rejects a null or empty hash, and rejects one longer than
+`0x7F` bytes, which would need long-form TLV length encoding that this tool
+does not implement. SHA-256, SHA-384 and SHA-512 digests all fit the short
+form.
+
+> **Not verified against a card.** The applet previously accepted an 8-byte
+> object under tag `9B`; whether a given applet accepts a 32-byte one depends
+> on the signature session it was opened with. If your card rejects the new
+> object, the session parameters in `COMP_SIGN_INIT_OPEN_SESSION_0002` are
+> where to look. Please report what you see.
+
+The option remains misnamed: it computes a digest and asks the card for a
 signature. No HMAC is involved.
 
 ## 2. `-hmac` with no filename throws

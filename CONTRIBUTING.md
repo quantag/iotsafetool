@@ -43,9 +43,9 @@ the `SPDX-License-Identifier` line.
 
 From [docs/review-notes.md](docs/review-notes.md), in rough order of value:
 
-1. **Issue 1** — `-hmac` signs only the first 8 bytes of the SHA-256 digest it
-   computes. This is the one that matters: it silently produces a signature over
-   a 64-bit truncation and still reports success.
+1. **Issue 1 is fixed**, but nobody has run it against a card yet. If you have
+   one, check that your applet accepts a 32-byte data-to-sign object and say so
+   in an issue — that is the most useful thing anyone can contribute right now.
 2. **Issue 3** — exit non-zero on failure and write errors to stderr, so the
    tool can be scripted.
 3. **Issue 4** — take the object identifier as an argument instead of
