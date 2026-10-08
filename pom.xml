@@ -69,10 +69,14 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.2.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
     </dependencies>
+
+    <!--
+      Guava 18.0 was declared here but never imported by any source file. It
+      has been removed: a shaded jar embeds every declared dependency, so an
+      unused one is attack surface and a license obligation for no benefit.
+
+      See docs/third-party.md for the remaining components and the versions
+      recommended for an update.
+    -->
 </project>

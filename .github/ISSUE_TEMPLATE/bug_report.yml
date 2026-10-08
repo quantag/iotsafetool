@@ -1,0 +1,77 @@
+# Copyright 2023-2026 Quantag IT Solutions GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+name: Bug report
+description: The tool does something wrong, or fails against your card
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check
+        [docs/review-notes.md](https://github.com/quantag/iotsafetool/blob/main/docs/review-notes.md)
+        first — the known rough edges are listed there with line references.
+
+        If the tool cannot select the applet at all, check which interface your
+        applet implements: this tool speaks the standard GSMA IoT SAFE command
+        set and does **not** drive the
+        [quantag/iotsafe](https://github.com/quantag/iotsafe) applet.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The command you ran, what you expected, and what you got.
+      placeholder: java -jar IoT_SAFE_Tool.jar -reader 0 -genkeys
+    validations:
+      required: true
+
+  - type: textarea
+    id: trace
+    attributes:
+      label: APDU trace
+      description: The tool prints one for every exchange — paste the relevant part.
+      render: text
+      placeholder: |
+        APDU-C: 00A404000FA00000003053F1240177010149534100
+        APDU-R: 6A82
+    validations:
+      required: true
+
+  - type: input
+    id: card
+    attributes:
+      label: Card and applet
+      description: The card, and which IoT SAFE applet is installed on it.
+      placeholder: SIM with vendor IoT SAFE applet, AID A00000003053F12401770101495341
+    validations:
+      required: true
+
+  - type: input
+    id: reader
+    attributes:
+      label: Card reader
+      placeholder: OMNIKEY Smart Card Reader USB 0
+
+  - type: input
+    id: java
+    attributes:
+      label: Java version
+      description: Output of `java -version`.
+      placeholder: temurin 17.0.11
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which operation
+      options:
+        - "-list (reader enumeration)"
+        - "-version"
+        - "-genkeys"
+        - "-getpub"
+        - "-hmac (sign and verify)"
+        - Applet selection / connection
+        - Build or packaging
+        - Documentation
+    validations:
+      required: true

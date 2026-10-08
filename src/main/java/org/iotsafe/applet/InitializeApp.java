@@ -1,3 +1,21 @@
+/*
+ * Copyright 2023-2026 Quantag IT Solutions GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package org.iotsafe.applet;
 
 import java.security.Security;
@@ -8,6 +26,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.iotsafe.utils.IoTSAFETools;
 import org.iotsafe.utils.Tools;
 
+/**
+ * Standalone example: connects to a card, selects the applet and runs the
+ * initialisation sequence.
+ */
 public class InitializeApp {
 
     public final static byte[] FILE_0001 = Tools.hexStringToBytes("830200017302303160010121010120020040");

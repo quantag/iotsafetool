@@ -1,0 +1,43 @@
+IoT SAFE Tool
+Copyright 2023-2026 Quantag IT Solutions GmbH
+
+This product includes software developed by
+Quantag IT Solutions GmbH (https://quantag-it.com).
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file
+for the governing terms.
+
+ATTRIBUTION
+-----------
+Section 4(d) of the Apache License, Version 2.0 requires that any
+redistribution of this work, or of Derivative Works thereof, carries a
+readable copy of the attribution notices contained in this NOTICE file.
+If you redistribute this software, in source or binary form, with or
+without modification, you must reproduce the text above in your own
+documentation, "About" screen, or other materials accompanying the
+distribution.
+
+THIRD-PARTY COMPONENTS
+----------------------
+The Maven build produces a shaded "jar-with-dependencies" artifact. That
+artifact embeds the following third-party libraries, each of which remains
+under its own license. Anyone redistributing the shaded jar is distributing
+these libraries and must satisfy their license terms as well.
+
+  Bouncy Castle Provider (org.bouncycastle:bcprov-jdk15on)
+    Copyright (c) 2000-2021 The Legion of the Bouncy Castle Inc.
+    Licensed under the Bouncy Castle License, an adaptation of the MIT
+    license. https://www.bouncycastle.org/licence.html
+
+  Apache Commons Lang (org.apache.commons:commons-lang3)
+    Copyright 2001-2026 The Apache Software Foundation.
+    Licensed under the Apache License, Version 2.0, and subject to its own
+    NOTICE file, which must be reproduced alongside this one when the
+    shaded jar is redistributed.
+
+The source tree itself contains no third-party code. Building requires a
+JDK and Apache Maven, which are not distributed here and remain subject to
+their own license terms.
+
+See docs/third-party.md for the current list and the obligations attached
+to each component.

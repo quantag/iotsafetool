@@ -1,0 +1,128 @@
+# Review notes
+
+Limitations found by reading the source before publication. Line references are
+against the current `main`. None of these is a vulnerability in a deployed
+system — this is a development tool, and the list exists so that anyone picking
+it up knows what they are getting.
+
+| # | Severity | Issue | Location |
+| --- | --- | --- | --- |
+| 1 | High | `-hmac` signs only the first 8 bytes of the digest it computes | `IoTSAFETool.java:155-157` |
+| 2 | Medium | `-hmac` with no filename throws `ArrayIndexOutOfBoundsException` | `IoTSAFEToolCL.java:74` |
+| 3 | Medium | Failures print a message and exit zero | `IoTSAFETool.java:76,98,142,196` |
+| 4 | Medium | Object identifiers and session parameters are hard-coded | `IoTSAFETool.java:58,148` |
+| 5 | Low | `-reader` with a bad index throws instead of reporting | `IoTSAFETool.java:54` |
+| 6 | Low | BouncyCastle is registered but never used | four files — see [third-party.md](third-party.md) |
+| 7 | Low | `applet/` classes hard-code a reader name and are unreachable | `InitializeApp`, `ReadDataApp`, `SignDataApp` |
+| 8 | Info | A variable is named `sdhkkshfjsk` | `IoTSAFETool.java:137` |
+
+---
+
+## 1. `-hmac` signs only the first 8 bytes of the digest
+
+`IoTSAFEToolCL` computes a full SHA-256 digest of the file, 32 bytes. `runHmac`
+then builds the data-to-sign object with a hard-coded 2-byte prefix `9B 08` —
+tag `9B`, length **8** — and copies exactly 8 bytes:
+
+```java
+byte[] addBytes = Tools.hexStringToBytes("9B08");
+byte[] finalByteFile = new byte[addBytes.length + 8];       // byteFile.length
+System.arraycopy(addBytes, 0, finalByteFile, 0, addBytes.length);
+System.arraycopy(byteFile, 0, finalByteFile, addBytes.length, 8);  // byteFile.length
+```
+
+The commented-out `byteFile.length` on both lines shows the intent: the length
+should follow the digest. As written, 24 of the 32 digest bytes are discarded,
+and the card signs a 64-bit truncation. Two different files agreeing in the
+first 8 digest bytes produce the same signature.
+
+The signature verifies, because verification is handed the same truncated
+object — so the tool reports success and nothing looks wrong.
+
+**Fix direction:** set the length byte from `byteFile.length` and copy all of
+it, which means encoding the length properly rather than hard-coding `9B 08`.
+Check first what digest lengths the target applet's signature session accepts.
+
+The option is also misnamed: it computes a digest and asks the card for a
+signature. No HMAC is involved.
+
+## 2. `-hmac` with no filename throws
+
+```java
+String fileName = argsList[i+1];
+```
+
+There is no bounds check — the guard that would have provided one is commented
+out immediately above. `-hmac` as the last argument exits with a raw
+`ArrayIndexOutOfBoundsException` and a stack trace. The same pattern in the
+`-reader` handler is guarded correctly, so this is an oversight rather than a
+convention.
+
+## 3. Failures print a message and exit zero
+
+Every operation wraps its body in `catch (Exception e)` and prints
+`"ERROR: " + e.getClass() + ": " + e.getMessage()`. The process then exits
+normally. A caller cannot tell success from failure except by parsing stdout,
+which makes the tool awkward to use from a script or a CI job.
+
+**Fix direction:** exit non-zero on failure, and write errors to stderr.
+
+## 4. Object identifiers and session parameters are hard-coded
+
+Key pair `0002` (`84 02 00 02`) and the signature session parameters
+(`84020002A1010191020001920104`) are `final` locals inside the methods that use
+them. Working with any other object on the card means editing the source and
+rebuilding.
+
+**Fix direction:** accept the object identifier as a command-line argument.
+
+## 5. `-reader` with a bad index throws instead of reporting
+
+```java
+this.readerName = terminals.get(Integer.parseInt(readerIndex)).getName();
+```
+
+A non-numeric value raises `NumberFormatException`; an out-of-range one raises
+`IndexOutOfBoundsException`. Both happen in the constructor, before any
+operation runs, and surface as a stack trace. An empty reader list produces
+`IndexOutOfBoundsException` rather than the `CardletException("No card reader
+available")` that the surrounding code clearly intends.
+
+## 6. BouncyCastle is registered but never used
+
+`Security.addProvider(new BouncyCastleProvider())` appears in four files and no
+BC algorithm is ever requested. See
+[third-party.md](third-party.md#bouncycastle-is-not-actually-used) — removing it
+would cut about 8 MB from the shaded jar.
+
+## 7. The `applet/` classes are unreachable
+
+`InitializeApp`, `ReadDataApp` and `SignDataApp` each have a `main` method and
+each hard-codes `"OMNIKEY Smart Card Reader USB 0"`. They are not reachable
+from `IoTSAFEToolCL`, which is the jar's declared main class, and they will not
+run on a machine with a different reader without an edit.
+
+They are useful as worked examples — each carries a real APDU trace in a
+trailing comment — which is why they are kept rather than deleted. The README
+says what they are.
+
+## 8. A variable is named `sdhkkshfjsk`
+
+`IoTSAFETool.java:137`. It holds the public key object identifier
+`85 02 00 02 00`. Renaming it is a one-line change and makes `runGetPublicKey`
+readable.
+
+---
+
+## What is not here
+
+There are no automated tests, and no CI job can exercise the card paths —
+everything meaningful needs a physical reader and a card. The CI configuration
+checks that the project compiles and that licensing stays intact; the rest is
+manual.
+
+## Reporting something not listed here
+
+For a defect with security impact, follow [SECURITY.md](../SECURITY.md). For
+everything else, an issue with the APDU trace and the card you used is the most
+useful thing you can send.
